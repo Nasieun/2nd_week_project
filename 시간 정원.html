@@ -1,0 +1,700 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>시간 정원</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@500;700&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#EEF1EA; --surface:#F8FAF5; --surface-2:#E4EADF; --ink:#1E2A22; --ink-soft:#56645A; --line:#CCD6C7;
+  --accent:#2E6A4C; --accent-ink:#FFFFFF; --accent-soft:#D6E6D8;
+  --sky-top:#D7E7EF; --sky-bottom:#EEF3E4; --sun:#F2BC4E; --sun-glow:rgba(242,188,78,.25);
+  --soil:#7A5A41; --soil-dark:#5E4431; --soil-ink:#F4EBDF; --soil-soft:#D9C6B2;
+  --stem:#4C8653; --leaf:#6EA765; --grass:#79AE6C; --petal-edge:rgba(30,42,34,.28);
+  --disc:#5A3B22; --eye:#F3D77A; --danger:#B4453A; --shadow:0 1px 2px rgba(30,42,34,.06),0 8px 24px rgba(30,42,34,.07);
+  --display:"Hahmlet","Nanum Myeongjo","Batang",serif;
+  --body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0F1512; --surface:#16201A; --surface-2:#1F2B24; --ink:#E3EAE2; --ink-soft:#9DAB9F; --line:#2C3A31;
+    --accent:#7CC59A; --accent-ink:#0F1512; --accent-soft:#21382B;
+    --sky-top:#111E30; --sky-bottom:#1C2B27; --sun:#E9E4C9; --sun-glow:rgba(233,228,201,.14);
+    --soil:#3C2D22; --soil-dark:#2A1F17; --soil-ink:#EADCCB; --soil-soft:#8E7A66;
+    --stem:#5C9A64; --leaf:#4E8A50; --grass:#3F7445; --petal-edge:rgba(0,0,0,.4);
+    --disc:#3A2516; --eye:#E3C764; --danger:#E58275; --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0F1512; --surface:#16201A; --surface-2:#1F2B24; --ink:#E3EAE2; --ink-soft:#9DAB9F; --line:#2C3A31;
+  --accent:#7CC59A; --accent-ink:#0F1512; --accent-soft:#21382B;
+  --sky-top:#111E30; --sky-bottom:#1C2B27; --sun:#E9E4C9; --sun-glow:rgba(233,228,201,.14);
+  --soil:#3C2D22; --soil-dark:#2A1F17; --soil-ink:#EADCCB; --soil-soft:#8E7A66;
+  --stem:#5C9A64; --leaf:#4E8A50; --grass:#3F7445; --petal-edge:rgba(0,0,0,.4);
+  --disc:#3A2516; --eye:#E3C764; --danger:#E58275; --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1140px;margin:0 auto;padding-inline:20px;padding-block:28px 64px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.25}
+button,input,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.num{font-variant-numeric:tabular-nums}
+
+/* header */
+.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px;margin-bottom:22px}
+.brand h1{font-size:clamp(2.2rem,5.4vw,3.3rem);font-weight:700;letter-spacing:-.01em}
+.brand .tag{font-family:var(--display);font-weight:500;font-size:clamp(1.02rem,2.2vw,1.2rem);color:var(--accent);margin-top:2px}
+.lead{max-width:34em;color:var(--ink-soft);margin:10px 0 0}
+.save-state{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink-soft);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:5px 12px}
+.save-state i{width:8px;height:8px;border-radius:50%;background:var(--soil-soft);display:block}
+.save-state[data-mode="cloud"] i{background:var(--accent)}
+
+/* layout */
+.main{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(0,1fr);gap:22px;align-items:start}
+@media (max-width:880px){.main{grid-template-columns:minmax(0,1fr)}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}
+
+/* garden */
+.garden{overflow:hidden}
+.g-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px 12px}
+.g-title{display:flex;flex-direction:column}
+.g-title h2{font-size:1.25rem;font-weight:700}
+.g-title span{font-size:13px;color:var(--ink-soft)}
+.weeknav{display:flex;gap:6px}
+.weeknav button{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:5px 10px;font-size:13px;cursor:pointer}
+.weeknav button:hover:not(:disabled){background:var(--surface-2)}
+.weeknav button:disabled{opacity:.4;cursor:default}
+.banner{margin:0 16px 12px;padding:9px 12px;border-radius:8px;background:var(--accent-soft);font-size:13.5px;color:var(--ink)}
+.stage{position:relative}
+.stage svg{display:block;width:100%;height:auto}
+.beds{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));background:var(--soil);color:var(--soil-ink);padding:2px 4px 12px;text-align:center}
+.beds div{padding:0 2px;min-width:0}
+.beds b{display:block;font-size:13.5px;font-weight:600;line-height:1.3}
+.beds span{display:block;font-size:11.5px;opacity:.82;line-height:1.35;word-break:keep-all}
+.beds .seed span{opacity:.6}
+.summary{padding:14px 16px 16px;display:grid;gap:10px;border-top:1px solid var(--line)}
+.summary p{margin:0;font-size:15px}
+.summary strong{font-weight:600}
+.moodrow{display:flex;flex-wrap:wrap;align-items:center;gap:5px;font-size:12.5px;color:var(--ink-soft)}
+.moodrow .lbl{margin-right:4px}
+.moodrow i{width:12px;height:12px;border-radius:50%;display:block;border:1px solid var(--petal-edge)}
+.sunnote{font-size:12.5px;color:var(--ink-soft)}
+
+.plant{animation:sway 7s ease-in-out infinite}
+@keyframes sway{0%,100%{transform:rotate(-1.1deg)}50%{transform:rotate(1.1deg)}}
+.bloom{cursor:pointer;outline:none}
+.bloom .bl{transform-box:fill-box;transform-origin:center;transition:transform .2s}
+.bloom:hover .bl,.bloom:focus-visible .bl{transform:scale(1.12)}
+.bloom:focus-visible .ring{stroke:var(--ink);stroke-width:2;stroke-dasharray:3 3}
+.bloom.new .bl{animation:bloomIn 1s cubic-bezier(.2,.9,.25,1.25) both}
+@keyframes bloomIn{from{transform:scale(0) rotate(-40deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
+@media (prefers-reduced-motion:reduce){.plant,.bloom.new .bl{animation:none}.bloom .bl{transition:none}}
+
+.pop{position:absolute;z-index:5;width:230px;background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);padding:11px 12px;font-size:13.5px;transform:translate(-50%,calc(-100% - 10px))}
+.pop.below{transform:translate(-50%,10px)}
+.pop .d{color:var(--ink-soft);font-size:12.5px}
+.pop .t{font-weight:600;margin:2px 0}
+.pop .m{margin:6px 0 0;word-break:break-all}
+.pop .row{display:flex;gap:6px;margin-top:9px;flex-wrap:wrap}
+.pop .x{position:absolute;top:4px;right:6px;border:0;background:none;cursor:pointer;color:var(--ink-soft);font-size:16px;line-height:1;padding:4px}
+
+/* buttons */
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:6px 11px;font-size:13px;cursor:pointer}
+.btn:hover{background:var(--surface-2)}
+.btn.danger{color:var(--danger);border-color:color-mix(in srgb,var(--danger) 40%,var(--line))}
+.btn.solid-danger{background:var(--danger);border-color:var(--danger);color:var(--surface)}
+
+/* form */
+.plantform{padding:18px 18px 20px;display:grid;gap:16px}
+.plantform h2{font-size:1.25rem}
+.plantform .sub{margin:-12px 0 0;font-size:13px;color:var(--ink-soft)}
+fieldset{border:0;margin:0;padding:0;min-width:0}
+legend,.flabel{font-size:12px;font-weight:600;letter-spacing:.06em;color:var(--ink-soft);margin-bottom:7px;padding:0;display:flex;justify-content:space-between;width:100%}
+legend em,.flabel em{font-style:normal;letter-spacing:0;font-weight:500;color:var(--ink-soft)}
+.chips{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.chip{position:relative}
+.chip input{position:absolute;opacity:0;pointer-events:none}
+.chip label{display:flex;align-items:center;gap:7px;border:1px solid var(--line);border-radius:9px;padding:6px 8px;cursor:pointer;background:var(--surface);min-height:44px;line-height:1.2}
+.chip label:hover{background:var(--surface-2)}
+.chip input:checked+label{border-color:var(--accent);background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
+.chip input:focus-visible+label{outline:2px solid var(--accent);outline-offset:2px}
+.chip svg{flex:none;width:26px;height:26px}
+.chip .nm{font-size:13.5px;font-weight:500}
+.chip .pl{display:block;font-size:11px;color:var(--ink-soft);font-weight:400}
+.moods{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.moods .chip label{min-height:38px}
+.moods .sw{width:16px;height:16px;border-radius:50%;flex:none;border:1px solid var(--petal-edge)}
+.durbox{display:grid;gap:8px}
+.durval{font-family:var(--display);font-size:1.35rem;font-weight:700}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.quick{display:flex;flex-wrap:wrap;gap:5px}
+.quick button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:3px 10px;font-size:12.5px;cursor:pointer}
+.quick button:hover{background:var(--surface-2)}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:10px}
+.field input{width:100%;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:8px 10px;font-size:14px}
+.preview{display:flex;align-items:center;gap:14px;background:var(--surface-2);border-radius:10px;padding:10px 12px}
+.preview svg{width:84px;height:84px;flex:none}
+.preview p{margin:0;font-size:13px;color:var(--ink-soft)}
+.preview p b{display:block;color:var(--ink);font-size:14.5px;font-weight:600}
+.submit{border:0;background:var(--accent);color:var(--accent-ink);border-radius:10px;padding:12px 14px;font-size:15px;font-weight:600;cursor:pointer}
+.submit:hover{filter:brightness(1.06)}
+.err{color:var(--danger);font-size:13px;margin:-6px 0 0}
+
+/* lower sections */
+section.block{margin-top:40px}
+.block > h2{font-size:1.45rem;font-weight:700;margin-bottom:4px}
+.block > .desc{color:var(--ink-soft);margin:0 0 16px;max-width:40em}
+.legend{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+@media (max-width:900px){.legend{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:520px){.legend{grid-template-columns:minmax(0,1fr)}}
+.lg{padding:14px 14px 16px;display:grid;gap:8px;align-content:start}
+.lg .k{font-size:12px;font-weight:600;letter-spacing:.06em;color:var(--ink-soft)}
+.lg h3{font-size:1.08rem;font-weight:700}
+.lg h3 span{color:var(--accent)}
+.lg p{margin:0;font-size:13.5px;color:var(--ink-soft)}
+.lg svg{width:100%;height:auto;max-height:84px}
+.promise{margin-top:12px;padding:13px 16px;border-radius:12px;border:1px dashed var(--line);font-size:14px;color:var(--ink)}
+
+.records{display:grid;gap:14px}
+.day h3{font-family:var(--body);font-size:13px;font-weight:600;color:var(--ink-soft);margin-bottom:6px;letter-spacing:.02em}
+.rec{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;align-items:center;gap:10px;padding:9px 12px;border-bottom:1px solid var(--line)}
+.rec:last-child{border-bottom:0}
+.rec .dot{width:14px;height:14px;border-radius:50%;border:1px solid var(--petal-edge)}
+.rec .what{min-width:0}
+.rec .what b{font-weight:600}
+.rec .what span{color:var(--ink-soft);font-size:13px}
+.rec .what .memo{display:block;font-size:13px;color:var(--ink-soft);overflow-wrap:anywhere}
+.rec .dur{font-size:14px}
+.rec .act{display:flex;gap:6px}
+.daycard{padding:2px 0}
+.empty{color:var(--ink-soft);font-size:14px;padding:14px 16px}
+
+.album{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}
+.thumb{padding:0;overflow:hidden;cursor:pointer;text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:12px}
+.thumb:hover{border-color:var(--accent)}
+.thumb[aria-current="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.thumb svg{display:block;width:100%;height:auto}
+.thumb div{padding:7px 10px 9px;font-size:12.5px;line-height:1.4}
+.thumb div b{display:block;font-size:13.5px;font-weight:600}
+.thumb div span{color:var(--ink-soft)}
+
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:999px;font-size:14px;z-index:20;box-shadow:var(--shadow)}
+footer{margin-top:44px;color:var(--ink-soft);font-size:12.5px}
+@media (max-width:520px){
+  .wrap{padding-inline:16px}
+  .beds b{font-size:12px}
+  .beds span{font-size:10.5px}
+  .chips{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .rec{grid-template-columns:auto minmax(0,1fr) auto;}
+  .rec .act{grid-column:2 / -1;justify-content:flex-end}
+}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <h1>시간 정원</h1>
+      <div class="tag">내가 보낸 시간이 나를 키운다</div>
+      <p class="lead">시간은 눈에 보이지 않지만, 기록하면 자라는 모습으로 남아요. 오늘 보낸 시간을 정원에 심어 보세요. 공부한 시간도, 쉬어 간 시간도 모두 정원의 한 자리를 채웁니다.</p>
+    </div>
+    <div class="save-state" id="saveState" data-mode="local"><i></i><span>이 브라우저에 저장</span></div>
+  </header>
+
+  <div class="main">
+    <article class="card garden" aria-labelledby="gTitle">
+      <div class="g-head">
+        <div class="g-title">
+          <h2 id="gTitle">이번 주 정원</h2>
+          <span id="gRange" class="num"></span>
+        </div>
+        <div class="weeknav">
+          <button type="button" id="prevWeek">‹ 지난주</button>
+          <button type="button" id="thisWeek">이번 주</button>
+          <button type="button" id="nextWeek">다음 주 ›</button>
+        </div>
+      </div>
+      <div class="banner" id="exampleBanner" hidden>지금 보이는 건 예시 정원이에요. 오른쪽에서 첫 기록을 심으면 나만의 정원으로 바뀝니다.</div>
+      <div class="stage" id="stage"></div>
+      <div class="beds" id="beds"></div>
+      <div class="summary" id="summary"></div>
+    </article>
+
+    <form class="card plantform" id="plantForm" novalidate>
+      <h2>오늘의 시간 심기</h2>
+      <p class="sub">무엇을 했는지, 얼마나, 어떤 기분이었는지 남겨 주세요.</p>
+
+      <fieldset>
+        <legend>활동 <em>식물의 종류</em></legend>
+        <div class="chips" id="actChips"></div>
+      </fieldset>
+
+      <div class="durbox">
+        <label class="flabel" for="dur">보낸 시간 <em>식물의 크기</em></label>
+        <div class="durval num" id="durVal">1시간</div>
+        <input type="range" id="dur" min="10" max="300" step="5" value="60">
+        <div class="quick" id="quick">
+          <button type="button" data-m="15">15분</button>
+          <button type="button" data-m="30">30분</button>
+          <button type="button" data-m="60">1시간</button>
+          <button type="button" data-m="120">2시간</button>
+          <button type="button" data-m="180">3시간</button>
+        </div>
+      </div>
+
+      <fieldset>
+        <legend>그때의 감정 <em>꽃의 색</em></legend>
+        <div class="moods" id="moodChips"></div>
+      </fieldset>
+
+      <div class="two">
+        <div class="field">
+          <label class="flabel" for="date">날짜</label>
+          <input type="date" id="date">
+        </div>
+        <div class="field">
+          <label class="flabel" for="memo">한 줄 메모 <em>선택</em></label>
+          <input type="text" id="memo" maxlength="60" placeholder="예: 통계 과제 2장">
+        </div>
+      </div>
+
+      <div class="preview" aria-live="polite">
+        <svg id="previewSvg" viewBox="0 0 120 120" aria-hidden="true"></svg>
+        <p id="previewText"></p>
+      </div>
+      <p class="err" id="formErr" hidden></p>
+      <button class="submit" type="submit">정원에 심기</button>
+    </form>
+  </div>
+
+  <section class="block" aria-labelledby="legendTitle">
+    <h2 id="legendTitle">정원 읽는 법</h2>
+    <p class="desc">정원은 시간을 네 가지 방식으로 보여 줍니다. 꽃 하나가 기록 하나예요.</p>
+    <div class="legend" id="legend"></div>
+    <div class="promise">기록하지 않은 날이 있어도 식물은 시들지 않아요. 정원에는 기록한 순간만 차곡차곡 쌓입니다. 휴식도 라벤더가 되어 다른 활동과 똑같이 자랍니다.</div>
+  </section>
+
+  <section class="block" aria-labelledby="recTitle">
+    <h2 id="recTitle">이 주의 기록</h2>
+    <p class="desc" id="recDesc">정원에 심긴 기록을 날짜별로 모았어요. 꽃을 눌러도 같은 내용을 볼 수 있어요.</p>
+    <div class="records" id="records"></div>
+  </section>
+
+  <section class="block" aria-labelledby="albumTitle">
+    <h2 id="albumTitle">지나온 정원</h2>
+    <p class="desc">한 주가 지나면 정원은 앨범에 남아요. 눌러서 그 주의 정원을 다시 볼 수 있어요.</p>
+    <div class="album" id="album"></div>
+  </section>
+
+  <footer>내 계정으로 열면 기록이 계정에 저장되고, 그렇지 않으면 이 브라우저에만 저장돼요. 다른 사람은 내 정원을 볼 수 없어요.</footer>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(function(){
+"use strict";
+const ACTS=[
+  {k:"study",name:"공부",plant:"해바라기"},
+  {k:"work",name:"일·과제",plant:"튤립"},
+  {k:"move",name:"운동",plant:"도라지꽃"},
+  {k:"rest",name:"휴식",plant:"라벤더"},
+  {k:"hobby",name:"취미",plant:"데이지"},
+  {k:"people",name:"만남",plant:"수국"}
+];
+const MOODS=[
+  {k:"joy",name:"기쁨",c:"#F2C14E"},
+  {k:"calm",name:"평온",c:"#7FB7D9"},
+  {k:"proud",name:"뿌듯",c:"#F08A5D"},
+  {k:"flutter",name:"설렘",c:"#EE82A8"},
+  {k:"tired",name:"지침",c:"#A99BC9"},
+  {k:"low",name:"가라앉음",c:"#5A6FA8"}
+];
+const actOf=k=>ACTS.find(a=>a.k===k)||ACTS[0];
+const moodOf=k=>MOODS.find(m=>m.k===k)||MOODS[1];
+const DAYS=["일","월","화","수","목","금","토"];
+const LS_KEY="time-garden:v1";
+
+/* ---------- date helpers ---------- */
+const pad=n=>String(n).padStart(2,"0");
+const ymd=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+const parse=s=>{const p=s.split("-").map(Number);return new Date(p[0],p[1]-1,p[2]);};
+const addDays=(d,n)=>{const x=new Date(d.getFullYear(),d.getMonth(),d.getDate());x.setDate(x.getDate()+n);return x;};
+const weekStart=d=>{const x=new Date(d.getFullYear(),d.getMonth(),d.getDate());x.setDate(x.getDate()-((x.getDay()+6)%7));return x;};
+const md=d=>(d.getMonth()+1)+"월 "+d.getDate()+"일";
+const dayLabel=s=>{const d=parse(s);return md(d)+" ("+DAYS[d.getDay()]+")";};
+function fmtDur(min){const h=Math.floor(min/60),m=min%60;if(!h)return m+"분";return h+"시간"+(m?" "+m+"분":"");}
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+const f=n=>Math.round(n*10)/10;
+const rid=()=>Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-4);
+
+/* ---------- state ---------- */
+let entries=[];
+let viewWeek=weekStart(new Date());
+let justAdded=null;
+let cloudRef=null;
+let firstSnap=true;
+let form={act:"study",min:60,mood:"calm"};
+
+function loadLocal(){
+  try{const raw=localStorage.getItem(LS_KEY);if(!raw)return [];const d=JSON.parse(raw);return Array.isArray(d.entries)?d.entries:[];}catch(e){return [];}
+}
+function saveLocal(list,cloud){
+  try{localStorage.setItem(LS_KEY,JSON.stringify({entries:list,cloud:!!cloud}));}catch(e){}
+}
+function localIsCloudMirror(){
+  try{const d=JSON.parse(localStorage.getItem(LS_KEY)||"{}");return !!d.cloud;}catch(e){return false;}
+}
+
+/* examples, shown only while the garden is empty (never saved) */
+function buildExamples(){
+  const ws=weekStart(new Date());const today=new Date();
+  const span=Math.round((new Date(today.getFullYear(),today.getMonth(),today.getDate())-ws)/864e5);
+  const cur=[
+    [0,"study",90,"calm","통계 과제 2장"],[0,"rest",40,"joy","강변 산책"],[0,"move",30,"proud","아침 스트레칭"],
+    [1,"study",120,"tired",""],[1,"people",60,"flutter","동아리 저녁"],
+    [2,"study",50,"calm",""],[2,"hobby",45,"joy","기타 연습"],[2,"rest",30,"calm","낮잠"],
+    [3,"work",80,"low","아르바이트"],[3,"rest",60,"calm","음악 들으며 쉬기"],[3,"study",60,"proud","발표 준비 끝"],
+    [4,"move",50,"joy","배드민턴"],[4,"study",100,"calm",""],
+    [5,"people",120,"joy","가족과 점심"],[5,"rest",90,"calm",""],
+    [6,"hobby",60,"flutter","그림 그리기"]
+  ].filter(r=>r[0]<=span);
+  const prev=[
+    [0,"study",60,"calm",""],[0,"rest",30,"calm",""],[1,"study",90,"proud",""],[1,"move",40,"joy",""],
+    [2,"work",120,"tired",""],[3,"study",70,"calm",""],[3,"hobby",50,"joy",""],[4,"people",90,"flutter",""],
+    [5,"rest",120,"calm",""],[5,"move",60,"proud",""],[6,"study",45,"low",""],[6,"rest",60,"joy",""]
+  ];
+  const mk=(base,r,i)=>({id:"ex"+ymd(base)+i,date:ymd(addDays(base,r[0])),act:r[1],min:r[2],mood:r[3],memo:r[4],ts:i,example:true});
+  return cur.map((r,i)=>mk(ws,r,i)).concat(prev.map((r,i)=>mk(addDays(ws,-7),r,100+i)));
+}
+const isExample=()=>entries.length===0;
+const shown=()=>isExample()?buildExamples():entries;
+
+/* ---------- drawing ---------- */
+function bloomShape(sp,cx,cy,r,c){
+  const e='stroke="var(--petal-edge)" stroke-width="0.8"';
+  let s="";
+  if(sp==="study"){
+    for(let i=0;i<14;i++){s+=`<ellipse cx="${f(cx)}" cy="${f(cy-r*.56)}" rx="${f(r*.22)}" ry="${f(r*.44)}" fill="${c}" ${e} transform="rotate(${f(i*360/14)} ${f(cx)} ${f(cy)})"/>`;}
+    s+=`<circle cx="${f(cx)}" cy="${f(cy)}" r="${f(r*.42)}" fill="var(--disc)"/>`;
+    s+=`<circle cx="${f(cx)}" cy="${f(cy)}" r="${f(r*.24)}" fill="none" stroke="${c}" stroke-opacity=".45" stroke-dasharray="1.5 2" stroke-width="1.2"/>`;
+  }else if(sp==="work"){
+    s+=`<path d="M${f(cx-r*.72)} ${f(cy-r*.42)} Q${f(cx-r*.8)} ${f(cy+r*.82)} ${f(cx)} ${f(cy+r*.82)} Q${f(cx+r*.8)} ${f(cy+r*.82)} ${f(cx+r*.72)} ${f(cy-r*.42)} L${f(cx+r*.36)} ${f(cy-r*.08)} L${f(cx)} ${f(cy-r*.68)} L${f(cx-r*.36)} ${f(cy-r*.08)} Z" fill="${c}" ${e} stroke-linejoin="round"/>`;
+    s+=`<path d="M${f(cx-r*.34)} ${f(cy+r*.74)} Q${f(cx)} ${f(cy-r*.95)} ${f(cx+r*.34)} ${f(cy+r*.74)} Z" fill="#fff" fill-opacity=".2"/>`;
+  }else if(sp==="move"){
+    let p="";for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,rr=i%2?r*.5:r;p+=(i?"L":"M")+f(cx+Math.cos(a)*rr)+" "+f(cy+Math.sin(a)*rr);}
+    s+=`<path d="${p}Z" fill="${c}" ${e} stroke-linejoin="round"/>`;
+    for(let i=0;i<5;i++){const a=-Math.PI/2+i*Math.PI*2/5;s+=`<line x1="${f(cx)}" y1="${f(cy)}" x2="${f(cx+Math.cos(a)*r*.62)}" y2="${f(cy+Math.sin(a)*r*.62)}" stroke="#fff" stroke-opacity=".35" stroke-width="1"/>`;}
+    s+=`<circle cx="${f(cx)}" cy="${f(cy)}" r="${f(r*.16)}" fill="#fff" fill-opacity=".7"/>`;
+  }else if(sp==="rest"){
+    s+=`<line x1="${f(cx)}" y1="${f(cy+r*.95)}" x2="${f(cx)}" y2="${f(cy-r*.95)}" stroke="var(--stem)" stroke-width="1.4"/>`;
+    for(let i=0;i<8;i++){const y=cy+r*.8-i*r*.24,x=cx+(i%2?1:-1)*r*.17,k=1-i*.06;s+=`<ellipse cx="${f(x)}" cy="${f(y)}" rx="${f(r*.21*k)}" ry="${f(r*.25*k)}" fill="${c}" ${e}/>`;}
+  }else if(sp==="hobby"){
+    for(let i=0;i<10;i++){s+=`<ellipse cx="${f(cx)}" cy="${f(cy-r*.53)}" rx="${f(r*.2)}" ry="${f(r*.47)}" fill="${c}" ${e} transform="rotate(${i*36} ${f(cx)} ${f(cy)})"/>`;}
+    s+=`<circle cx="${f(cx)}" cy="${f(cy)}" r="${f(r*.28)}" fill="var(--eye)" ${e}/>`;
+  }else{
+    const pts=[[0,0]];for(let i=0;i<6;i++){const a=i*Math.PI/3+.3;pts.push([Math.cos(a)*r*.56,Math.sin(a)*r*.56]);}
+    pts.forEach(([dx,dy])=>{s+=`<circle cx="${f(cx+dx)}" cy="${f(cy+dy)}" r="${f(r*.37)}" fill="${c}" ${e}/><circle cx="${f(cx+dx)}" cy="${f(cy+dy)}" r="${f(r*.08)}" fill="#fff" fill-opacity=".75"/>`;});
+  }
+  return s;
+}
+const bloomR=min=>Math.min(28,6+Math.sqrt(min)*1.3);
+
+const G=410,W=800,H=430,NODE=40;
+function gardenSVG(list,ws,opts){
+  const mini=!!(opts&&opts.mini);const uid=rid();
+  const we=ymd(addDays(ws,7)),ws0=ymd(ws);
+  const wk=list.filter(e=>e.date>=ws0&&e.date<we);
+  let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" ${mini?'aria-hidden="true"':'role="group" aria-label="이번 주 정원"'}>`;
+  s+=`<defs><linearGradient id="sky${uid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--sky-top)"/><stop offset="1" style="stop-color:var(--sky-bottom)"/></linearGradient></defs>`;
+  s+=`<rect x="0" y="0" width="${W}" height="${G}" fill="url(#sky${uid})"/>`;
+  /* the sun crosses the sky as the week passes */
+  const now=new Date();const p=Math.max(0,Math.min(1,(now-ws)/(7*864e5)));
+  const sx=50+p*700,sy=150-Math.sin(Math.PI*p)*112;
+  s+=`<circle cx="${f(sx)}" cy="${f(sy)}" r="34" fill="var(--sun-glow)"/><circle cx="${f(sx)}" cy="${f(sy)}" r="17" fill="var(--sun)"/>`;
+  if(!mini){s+=`<path d="M50 150 Q400 -74 750 150" fill="none" stroke="var(--ink-soft)" stroke-opacity=".18" stroke-dasharray="2 6"/>`;}
+  s+=`<rect x="0" y="${G}" width="${W}" height="${H-G}" fill="var(--soil)"/>`;
+  s+=`<path d="M0 ${G} Q100 ${G-5} 200 ${G} T400 ${G} T600 ${G} T800 ${G} V${G+6} H0Z" fill="var(--soil-dark)" opacity=".55"/>`;
+  for(let i=0;i<26;i++){const x=(i*97+31)%W,h=5+(i*7)%7;s+=`<path d="M${x} ${G+1} l-3 -${h} M${x} ${G+1} l2 -${h+2} M${x} ${G+1} l5 -${h-1}" stroke="var(--grass)" stroke-width="1.4" stroke-linecap="round" fill="none"/>`;}
+
+  ACTS.forEach((a,i)=>{
+    const x=(i+.5)*W/6;
+    const recs=wk.filter(e=>e.act===a.k).sort((p,q)=>p.date<q.date?-1:p.date>q.date?1:(p.ts||0)-(q.ts||0));
+    if(!recs.length){
+      if(!mini){s+=`<ellipse cx="${f(x)}" cy="${G+2}" rx="20" ry="7" fill="var(--soil-dark)"/><ellipse cx="${f(x)}" cy="${G-2}" rx="4" ry="3" fill="var(--soil-soft)"/>`;}
+      return;
+    }
+    const days=[];recs.forEach(r=>{let d=days.find(d=>d.date===r.date);if(!d){d={date:r.date,recs:[]};days.push(d);}d.recs.push(r);});
+    const total=recs.reduce((t,r)=>t+r.min,0);
+    const n=days.length,h=n*NODE+12,sw=Math.min(7,2.2+total/150);
+    const bend=(i%2?1:-1)*(8+n*1.5);
+    const xs=y=>x+bend*Math.sin(Math.PI*Math.min(1,(G-y)/h)*.9);
+    let path="";for(let t=0;t<=h;t+=6){path+=(t?"L":"M")+f(xs(G-t))+" "+f(G-t);}
+    s+=`<g class="plant" style="transform-origin:${f(x)}px ${G}px;animation-delay:-${i*1.3}s;animation-duration:${6+i*.7}s">`;
+    s+=`<path d="${path}" fill="none" stroke="var(--stem)" stroke-width="${f(sw)}" stroke-linecap="round" stroke-linejoin="round"/>`;
+    for(let k=0;k<n;k++){
+      const y=G-(k+.5)*NODE,sx2=xs(y),dir=k%2?1:-1,L=13+sw*1.6;
+      s+=`<path d="M${f(sx2)} ${f(y)} Q${f(sx2+dir*L*.5)} ${f(y-L*.5)} ${f(sx2+dir*L)} ${f(y-L*.12)} Q${f(sx2+dir*L*.5)} ${f(y+L*.22)} ${f(sx2)} ${f(y)}Z" fill="var(--leaf)"/>`;
+    }
+    days.forEach((d,k)=>{
+      const y=G-(k+1)*NODE,cx0=xs(y);
+      const rs=d.recs.map(r=>bloomR(r.min));const gap=3;
+      const width=rs.reduce((t,r)=>t+2*r,0)+gap*(rs.length-1);
+      let cur=cx0-width/2;
+      d.recs.forEach((r,j)=>{
+        const rr=rs[j],bx=cur+rr,by=y+(rs.length>1?(j%2?5:-5):0);cur+=2*rr+gap;
+        if(Math.abs(bx-cx0)>1){s+=`<path d="M${f(cx0)} ${f(y+4)} Q${f((bx+cx0)/2)} ${f(y+2)} ${f(bx)} ${f(by)}" stroke="var(--stem)" stroke-width="1.6" fill="none"/>`;}
+        const m=moodOf(r.mood);
+        const label=`${dayLabel(r.date)} ${a.name} ${fmtDur(r.min)}, ${m.name}`;
+        if(mini){s+=`<g>${bloomShape(a.k,bx,by,rr,m.c)}</g>`;}
+        else{s+=`<g class="bloom${r.id===justAdded?" new":""}" data-id="${esc(r.id)}" tabindex="0" role="button" aria-label="${esc(label)}"><circle class="ring" cx="${f(bx)}" cy="${f(by)}" r="${f(rr+4)}" fill="transparent" stroke="none"/><g class="bl">${bloomShape(a.k,bx,by,rr,m.c)}</g></g>`;}
+      });
+    });
+    s+=`</g>`;
+  });
+  s+=`</svg>`;
+  return s;
+}
+
+/* ---------- render ---------- */
+const $=id=>document.getElementById(id);
+function weekEntries(list,ws){const a=ymd(ws),b=ymd(addDays(ws,7));return list.filter(e=>e.date>=a&&e.date<b);}
+
+function render(){
+  closePop();
+  const list=shown();
+  const curWs=weekStart(new Date());
+  const isCur=ymd(viewWeek)===ymd(curWs);
+  const weeksAgo=Math.round((curWs-viewWeek)/(7*864e5));
+  $("gTitle").textContent=isCur?"이번 주 정원":weeksAgo===1?"지난주 정원":weeksAgo+"주 전 정원";
+  $("gRange").textContent=md(viewWeek)+" – "+md(addDays(viewWeek,6));
+  $("nextWeek").disabled=viewWeek>=curWs;
+  $("thisWeek").disabled=isCur;
+  $("exampleBanner").hidden=!isExample();
+  $("stage").innerHTML=gardenSVG(list,viewWeek);
+
+  const wk=weekEntries(list,viewWeek);
+  $("beds").innerHTML=ACTS.map(a=>{
+    const t=wk.filter(e=>e.act===a.k).reduce((s,e)=>s+e.min,0);
+    return t?`<div><b>${a.name}</b><span class="num">${a.plant} · ${fmtDur(t)}</span></div>`:`<div class="seed"><b>${a.name}</b><span>${a.plant} 씨앗</span></div>`;
+  }).join("");
+
+  const total=wk.reduce((s,e)=>s+e.min,0);
+  const rest=wk.filter(e=>e.act==="rest").reduce((s,e)=>s+e.min,0);
+  const dayCount=new Set(wk.map(e=>e.date)).size;
+  const sm=$("summary");
+  if(!wk.length){
+    sm.innerHTML=`<p>이 주에는 아직 심은 기록이 없어요. 흙은 언제든 기다리고 있어요.</p>`;
+  }else{
+    const sorted=wk.slice().sort((p,q)=>p.date<q.date?-1:p.date>q.date?1:(p.ts||0)-(q.ts||0));
+    sm.innerHTML=`<p>이 정원에는 <strong class="num">${fmtDur(total)}</strong>이 쌓였어요. 꽃 <strong class="num">${wk.length}송이</strong>, 기록한 날 <strong class="num">${dayCount}일</strong>${rest?`, 그중 <strong class="num">${fmtDur(rest)}</strong>(${Math.round(rest/total*100)}%)은 휴식이에요.`:"이에요."}</p>
+      <div class="moodrow"><span class="lbl">감정의 색</span>${sorted.map(e=>{const m=moodOf(e.mood);return `<i style="background:${m.c}" title="${esc(dayLabel(e.date)+" · "+m.name)}"></i>`;}).join("")}</div>
+      <div class="sunnote">하늘의 해는 한 주가 흐른 만큼 왼쪽에서 오른쪽으로 움직여요. 줄기의 마디 하나가 기록한 하루예요.</div>`;
+  }
+  renderRecords(wk);
+  renderAlbum(list);
+  justAdded=null;
+}
+
+function renderRecords(wk){
+  const box=$("records");
+  $("recDesc").textContent=isExample()?"예시 기록이에요. 첫 기록을 심으면 여기에 내 기록이 모입니다.":"정원에 심긴 기록을 날짜별로 모았어요. 꽃을 눌러도 같은 내용을 볼 수 있어요.";
+  if(!wk.length){box.innerHTML=`<div class="card empty">이 주에는 기록이 없어요.</div>`;return;}
+  const dates=[...new Set(wk.map(e=>e.date))].sort().reverse();
+  box.innerHTML="";
+  dates.forEach(d=>{
+    const wrap=document.createElement("div");wrap.className="day";
+    const h=document.createElement("h3");h.textContent=dayLabel(d);wrap.appendChild(h);
+    const card=document.createElement("div");card.className="card daycard";
+    wk.filter(e=>e.date===d).sort((p,q)=>(p.ts||0)-(q.ts||0)).forEach(e=>{
+      const a=actOf(e.act),m=moodOf(e.mood);
+      const row=document.createElement("div");row.className="rec";
+      row.innerHTML=`<i class="dot" style="background:${m.c}"></i><div class="what"><b></b> <span></span><span class="memo"></span></div><span class="dur num"></span><div class="act"></div>`;
+      row.querySelector("b").textContent=a.name;
+      row.querySelector(".what span").textContent=a.plant+" · "+m.name;
+      const memo=row.querySelector(".memo");if(e.memo)memo.textContent=e.memo;else memo.remove();
+      row.querySelector(".dur").textContent=fmtDur(e.min);
+      if(!e.example)row.querySelector(".act").appendChild(deleteControl(e.id));
+      card.appendChild(row);
+    });
+    wrap.appendChild(card);box.appendChild(wrap);
+  });
+}
+
+function deleteControl(id){
+  const box=document.createElement("div");box.className="act";
+  const ask=()=>{
+    box.innerHTML="";
+    const yes=document.createElement("button");yes.type="button";yes.className="btn solid-danger";yes.textContent="지우기";
+    const no=document.createElement("button");no.type="button";no.className="btn";no.textContent="취소";
+    yes.onclick=()=>removeEntry(id);no.onclick=idle;
+    box.append(yes,no);yes.focus();
+  };
+  const idle=()=>{box.innerHTML="";const b=document.createElement("button");b.type="button";b.className="btn danger";b.textContent="기록 지우기";b.onclick=ask;box.appendChild(b);};
+  idle();return box;
+}
+
+function renderAlbum(list){
+  const box=$("album");
+  const keys=[...new Set(list.map(e=>ymd(weekStart(parse(e.date)))))].sort().reverse().slice(0,16);
+  const curKey=ymd(weekStart(new Date()));
+  if(!keys.includes(curKey))keys.unshift(curKey);
+  box.innerHTML="";
+  keys.forEach(k=>{
+    const ws=parse(k);const wk=weekEntries(list,ws);const t=wk.reduce((s,e)=>s+e.min,0);
+    const b=document.createElement("button");b.type="button";b.className="thumb";
+    b.setAttribute("aria-current",String(k===ymd(viewWeek)));
+    b.innerHTML=gardenSVG(list,ws,{mini:true})+`<div><b>${k===curKey?"이번 주":md(ws)+" 주"}</b><span class="num">${wk.length?`꽃 ${wk.length}송이 · ${fmtDur(t)}`:"아직 빈 정원"}</span></div>`;
+    b.onclick=()=>{viewWeek=ws;render();$("gTitle").scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"});};
+    box.appendChild(b);
+  });
+}
+
+/* ---------- popover on a bloom ---------- */
+let popEl=null;
+function closePop(){if(popEl){popEl.remove();popEl=null;}}
+function openPop(g){
+  closePop();
+  const id=g.getAttribute("data-id");const e=shown().find(x=>x.id===id);if(!e)return;
+  const a=actOf(e.act),m=moodOf(e.mood);
+  const stage=$("stage");const sr=stage.getBoundingClientRect(),br=g.getBoundingClientRect();
+  const p=document.createElement("div");p.className="pop";p.setAttribute("role","dialog");p.setAttribute("aria-label","기록 자세히");
+  p.innerHTML=`<button type="button" class="x" aria-label="닫기">×</button><div class="d"></div><div class="t"></div><div class="num s"></div>`;
+  p.querySelector(".d").textContent=dayLabel(e.date)+(e.example?" · 예시":"");
+  p.querySelector(".t").textContent=a.name+" · "+a.plant;
+  p.querySelector(".s").innerHTML=`<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${m.c};margin-right:6px;border:1px solid var(--petal-edge)"></span>`;
+  p.querySelector(".s").append(fmtDur(e.min)+" · "+m.name);
+  if(e.memo){const mm=document.createElement("p");mm.className="m";mm.textContent=e.memo;p.appendChild(mm);}
+  if(!e.example){const r=document.createElement("div");r.className="row";r.appendChild(deleteControl(e.id));p.appendChild(r);}
+  p.querySelector(".x").onclick=()=>{closePop();g.focus();};
+  let left=br.left+br.width/2-sr.left;left=Math.max(122,Math.min(sr.width-122,left));
+  const top=br.top-sr.top;
+  if(top<150){p.classList.add("below");p.style.top=(br.bottom-sr.top)+"px";}else{p.style.top=top+"px";}
+  p.style.left=left+"px";
+  stage.appendChild(p);popEl=p;
+}
+$("stage").addEventListener("click",ev=>{
+  const g=ev.target.closest(".bloom");if(g){ev.stopPropagation();openPop(g);}
+});
+$("stage").addEventListener("keydown",ev=>{
+  const g=ev.target.closest(".bloom");if(g&&(ev.key==="Enter"||ev.key===" ")){ev.preventDefault();openPop(g);}
+});
+document.addEventListener("click",ev=>{if(popEl&&!ev.composedPath().includes(popEl))closePop();});
+document.addEventListener("keydown",ev=>{if(ev.key==="Escape")closePop();});
+
+/* ---------- form ---------- */
+function buildForm(){
+  $("actChips").innerHTML=ACTS.map(a=>`<div class="chip"><input type="radio" name="act" id="act-${a.k}" value="${a.k}"${a.k===form.act?" checked":""}><label for="act-${a.k}"><svg viewBox="0 0 40 40" aria-hidden="true" data-sp="${a.k}"></svg><span class="nm">${a.name}<span class="pl">${a.plant}</span></span></label></div>`).join("");
+  $("moodChips").innerHTML=MOODS.map(m=>`<div class="chip"><input type="radio" name="mood" id="mood-${m.k}" value="${m.k}"${m.k===form.mood?" checked":""}><label for="mood-${m.k}"><i class="sw" style="background:${m.c}"></i><span class="nm">${m.name}</span></label></div>`).join("");
+  const today=ymd(new Date());$("date").value=today;$("date").max=today;
+  $("actChips").addEventListener("change",e=>{form.act=e.target.value;updatePreview();});
+  $("moodChips").addEventListener("change",e=>{form.mood=e.target.value;updatePreview();});
+  $("dur").addEventListener("input",e=>{form.min=+e.target.value;updatePreview();});
+  $("quick").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;form.min=+b.dataset.m;$("dur").value=form.min;updatePreview();});
+  updatePreview();
+}
+function updatePreview(){
+  const c=moodOf(form.mood).c;
+  document.querySelectorAll("#actChips svg").forEach(s=>{s.innerHTML=bloomShape(s.dataset.sp,20,20,15,c);});
+  $("durVal").textContent=fmtDur(form.min);
+  const r=bloomR(form.min)*1.9;
+  $("previewSvg").innerHTML=`<circle cx="60" cy="60" r="${f(bloomR(300)*1.9)}" fill="none" stroke="var(--ink-soft)" stroke-opacity=".35" stroke-dasharray="3 4"/>`+bloomShape(form.act,60,60,r,c);
+  const a=actOf(form.act),m=moodOf(form.mood);
+  $("previewText").innerHTML="";
+  const b=document.createElement("b");b.textContent=`${m.name}의 색을 띤 ${a.plant}`;
+  $("previewText").append(b,`${fmtDur(form.min)}만큼 자란 크기예요. 점선은 5시간일 때의 크기입니다.`);
+}
+$("plantForm").addEventListener("submit",ev=>{
+  ev.preventDefault();
+  const err=$("formErr");err.hidden=true;
+  const today=ymd(new Date());let d=$("date").value||today;
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(d)){err.textContent="날짜를 다시 골라 주세요.";err.hidden=false;return;}
+  if(d>today){err.textContent="앞으로 올 날에는 아직 심을 수 없어요. 오늘이나 지난 날을 골라 주세요.";err.hidden=false;return;}
+  const rec={id:rid(),date:d,act:form.act,min:form.min,mood:form.mood,memo:$("memo").value.trim().slice(0,60),ts:Date.now()};
+  entries=entries.concat([rec]);
+  justAdded=rec.id;viewWeek=weekStart(parse(d));
+  $("memo").value="";
+  persist();render();
+  toast(`${actOf(rec.act).plant} 한 송이를 심었어요`);
+  if(matchMedia("(max-width:880px)").matches)$("gTitle").scrollIntoView({block:"start"});
+});
+function removeEntry(id){
+  entries=entries.filter(e=>e.id!==id);
+  persist();render();toast("기록을 지웠어요");
+}
+
+let toastT=0;
+function toast(msg){const t=$("toast");t.textContent=msg;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>{t.hidden=true;},2200);}
+
+/* ---------- persistence: account (db) when available, this browser otherwise ---------- */
+let writing=false,again=false;
+async function persist(){
+  if(!cloudRef){saveLocal(entries,false);return;}
+  if(writing){again=true;return;}
+  writing=true;setSave("cloud","내 계정에 저장 중…");
+  try{await cloudRef.set({entries:entries,updatedAt:Date.now()});setSave("cloud","내 계정에 저장됨");}
+  catch(e){
+    if(e&&e.code==="unavailable"){await new Promise(r=>setTimeout(r,800+Math.random()*800));try{await cloudRef.set({entries:entries,updatedAt:Date.now()});setSave("cloud","내 계정에 저장됨");}catch(e2){saveFail();}}
+    else saveFail();
+  }
+  writing=false;
+  if(again){again=false;persist();}
+}
+function saveFail(){setSave("local","계정 저장 실패 · 이 브라우저에 보관");saveLocal(entries,false);toast("계정에 저장하지 못해 이 브라우저에 보관했어요");}
+function setSave(mode,text){const s=$("saveState");s.dataset.mode=mode;s.querySelector("span").textContent=text;}
+
+async function connect(){
+  if(!window.claude||typeof window.claude.use!=="function")return;
+  try{
+    const [db,user]=await Promise.all([window.claude.use("db"),window.claude.use("user")]);
+    if(!db||!user)return;
+    const uid=await user.id();if(!uid)return;
+    cloudRef=db.doc("data/users/"+uid+"/garden");
+    setSave("cloud","내 계정에 연결 중…");
+    cloudRef.onSnapshot(snap=>{
+      const cloud=snap.exists&&Array.isArray((snap.data()||{}).entries)?snap.data().entries.map(x=>Object.assign({},x)):[];
+      if(firstSnap){
+        firstSnap=false;
+        const ids=new Set(cloud.map(e=>e.id));
+        const localOnly=localIsCloudMirror()?[]:entries.filter(e=>!ids.has(e.id));
+        entries=cloud.concat(localOnly);
+        saveLocal([],true);
+        setSave("cloud","내 계정에 저장됨");
+        if(localOnly.length)persist();
+      }else if(!snap.metadata.hasPendingWrites){
+        entries=cloud;
+      }
+      render();
+    },()=>{cloudRef=null;setSave("local","이 브라우저에 저장");saveLocal(entries,false);});
+  }catch(e){cloudRef=null;}
+}
+
+entries=localIsCloudMirror()?[]:loadLocal();
+buildForm();
+render();
+$("prevWeek").onclick=()=>{viewWeek=addDays(viewWeek,-7);render();};
+$("nextWeek").onclick=()=>{viewWeek=addDays(viewWeek,7);render();};
+$("thisWeek").onclick=()=>{viewWeek=weekStart(new Date());render();};
+
+/* legend */
+(function legend(){
+  const sizes=[15,60,180].map((m,i)=>{const r=bloomR(m);return bloomShape("hobby",30+i*70+(i?r*.4:0),45,r,"#F2C14E");}).join("");
+  const kinds=ACTS.map((a,i)=>bloomShape(a.k,22+i*39,45,15,MOODS[i].c)).join("");
+  const colors=MOODS.map((m,i)=>`<circle cx="${22+i*39}" cy="40" r="13" fill="${m.c}" stroke="var(--petal-edge)"/><text x="${22+i*39}" y="74" text-anchor="middle" font-size="11" fill="var(--ink-soft)" font-family="var(--body)">${m.name}</text>`).join("");
+  let stem=`<path d="M40 82 Q46 45 40 6" stroke="var(--stem)" stroke-width="3" fill="none"/>`;
+  [66,44,22].forEach((y,i)=>{stem+=`<circle cx="${41+(i===1?4:0)}" cy="${y}" r="7" fill="${MOODS[i+1].c}" stroke="var(--petal-edge)"/><text x="62" y="${y+4}" font-size="11" fill="var(--ink-soft)" font-family="var(--body)">${["월요일","수요일","목요일"][i]}</text>`;});
+  stem+=`<path d="M150 82 Q154 64 150 50" stroke="var(--stem)" stroke-width="3" fill="none"/><circle cx="151" cy="50" r="7" fill="${MOODS[0].c}" stroke="var(--petal-edge)"/><text x="170" y="54" font-size="11" fill="var(--ink-soft)" font-family="var(--body)">하루만</text>`;
+  const items=[
+    ["시간의 길이","오래 할수록 <span>꽃이 커져요</span>","15분, 1시간, 3시간. 같은 데이지라도 보낸 시간만큼 크기가 달라요.",`<svg viewBox="0 0 240 90">${sizes}</svg>`],
+    ["활동의 종류","활동마다 <span>다른 식물</span>","공부는 해바라기, 일은 튤립, 운동은 도라지꽃, 휴식은 라벤더, 취미는 데이지, 만남은 수국으로 자라요.",`<svg viewBox="0 0 240 90">${kinds}</svg>`],
+    ["그날의 감정","감정이 <span>꽃의 색</span>이 돼요","좋은 감정만 고를 필요는 없어요. 지치고 가라앉은 날의 색도 정원의 일부예요.",`<svg viewBox="0 0 240 90">${colors}</svg>`],
+    ["꾸준함","같은 식물이 <span>며칠에 걸쳐</span> 자라요","한 주 동안 같은 활동을 여러 날 기록하면 줄기에 마디가 생기며 키가 커져요.",`<svg viewBox="0 0 240 90">${stem}</svg>`]
+  ];
+  $("legend").innerHTML=items.map(([k,h,p,svg])=>`<div class="card lg"><div class="k">${k}</div><h3>${h}</h3>${svg}<p>${p}</p></div>`).join("");
+})();
+
+connect();
+})();
+</script>
+
+</body></html>
